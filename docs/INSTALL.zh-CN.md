@@ -2,14 +2,14 @@
 
 [项目首页](../README.md) · [English](INSTALL.en.md) · [日本語](INSTALL.ja.md)
 
-本指南区分**已发布 0.2.0-alpha / 机内 0.2a** 与**本地开发 0.3.0-alpha / 机内 0.3a**。第 0 节继续下载 0.2.0；第 3、5 节的本地构建示例使用尚未发布、未实机验证的 0.3.0。历史实机环境为 a5100 固件1.10、Android 2.3.7；macOS 构建与 Wi-Fi 安装已有旧版验证。Windows/Linux 的命令说明未做相同的实机全流程验证。
+本指南使用**已发布 0.3.0-alpha / 机内 0.3a**，可直接下载 APK 或自行构建。a5100 固件 1.10、Android 2.3.7 上已完成覆盖安装和启动，并获得用户对本次界面更新的实机总体确认。macOS 构建与 Wi-Fi 安装已验证；Windows/Linux 的命令说明未做相同的实机全流程验证。
 
-**0.2.0-alpha 更名为「胶片工坊」，保留旧版包名与签名，可用 `install -r` 覆盖更新。新增理光风格使用上游原参数，100% 不重新调色；四档强度、拍照和录像菜单共用。新合并版已在 a5100 上安装、启动，并有部分滤镜参数应用成功日志；旧版记录不代表本版所有照片／录像组合已验证。**
+**「胶片工坊」保留旧版包名与签名，可用 `install -r` 覆盖更新。15 个富士参考／理光风格共用四档强度和拍照／录像菜单；0.3.0 保留全部既有色彩参数，增加实时预览、按需加载和不同图标。实机记录包括 15 个滤镜参数应用成功和用户总体确认，不代表所有照片／录像保存组合已逐项验证。**
 
 ## 0. 直接安装发行版 APK
 
 1. 先看[机型兼容性](../README.md#compatibility)，确认你的机型和预期功能在说明范围内。
-2. 在[Releases](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.2.0-alpha)的 Assets 中下载 **[FilmStudio-0.2.0-alpha-movie.apk](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/download/v0.2.0-alpha/FilmStudio-0.2.0-alpha-movie.apk)**；不要下载 Source code ZIP 当作安装包。
+2. 在[Releases](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.3.0-alpha)的 Assets 中下载 **[FilmStudio-0.3.0-alpha-movie.apk](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/download/v0.3.0-alpha/FilmStudio-0.3.0-alpha-movie.apk)**；不要下载 Source code ZIP 当作安装包。
 3. 同时下载 `SHA256SUMS.txt`，用 macOS 的 `shasum -a 256`、Linux 的 `sha256sum` 或 PowerShell 的 `Get-FileHash -Algorithm SHA256` 核对 APK。校验的是文件一致性，不是法律许可或兼容保证。
 4. 电脑安装 [Android Platform-Tools / adb](https://developer.android.com/tools/releases/platform-tools)。首次连接相机时按第 4 节启用 Wi-Fi ADB，再按第 5 节安装。已能连接 ADB 的用户可直接看第 5 节。
 5. **现成 APK 不需要 Python、Java、Apktool 或签名私钥。** 第 1～3 节供希望自行构建的读者使用。
@@ -20,7 +20,7 @@
 
 ```sh
 adb connect CAMERA_IP:5555
-adb -s CAMERA_IP:5555 install -r FilmStudio-0.2.0-alpha-movie.apk
+adb -s CAMERA_IP:5555 install -r FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 将 `CAMERA_IP` 换成相机当前地址，安装完成显示 `Success`，然后在机身应用列表打开「胶片工坊」。第 5 节中的 `output/` 路径是本地构建输出目录；直接下载的用户请使用实际下载路径。
@@ -137,9 +137,9 @@ pmca-gui 的「Select an apk → Open apk... → Install selected app」可作�
 
 ## 6. 相机操作与首次自检
 
-**0.3.0 本地开发版新增的预览操作（未实机验证）：** 打开滤镜列表后保留实时取景；用方向键或拨轮移动选中项，停留后预览该滤镜。连续切换采用 120 ms 等待，只处理最后一项；实际显示延迟还取决于相机。按中心键确认并保存，返回／取消或半按快门退出时恢复打开列表前的滤镜。先确认，再拍照或按 MOVIE，避免把未确认的预览当成已保存的选择。
+**0.3.0 的预览操作：** 打开滤镜列表后保留实时取景；用方向键或拨轮移动选中项，停留后预览该滤镜。连续切换采用 120 ms 等待，只处理最后一项；实际显示延迟还取决于相机。按中心键确认并保存，返回／取消或半按快门退出时恢复打开列表前的滤镜。先确认，再拍照或按 MOVIE，避免把未确认的预览当成已保存的选择。
 
-15 个图标使用不同缩写与颜色，表示滤镜身份而非效果样张。每个「滤镜＋强度」的参数首次使用时加载，后续复用；原有色彩参数不变，实际启动和切换耗时尚未测量。**下载的 0.2.0 没有这些新增功能。**
+15 个图标使用不同缩写与颜色，表示滤镜身份而非效果样张。每个「滤镜＋强度」的参数首次使用时加载，后续复用；原有色彩参数不变，实际启动和切换耗时尚未测量。本次界面更新已获 a5100 用户实机总体确认，详见[验证记录](VALIDATION.md)。
 
 1. 拍照预览或录像待机按**中心键**选择风格。按 MENU 也可从首页进入「胶片风格」。列表包含「富士」与「理光」两组前缀，共 15 项。
 2. MENU 首页 →「滤镜强度」选择30/50/70/100%。初始100%，正常退出后保存。人像先对比30%与50%。
@@ -158,9 +158,11 @@ pmca-gui 的「Select an apk → Open apk... → Install selected app」可作�
 | `INSTALL_PARSE_FAILED_NO_CERTIFICATES` / `INSTALL_FAILED_DEXOPT` | 检查是否按固定版本工具构建；需要 API10兼容的DEX035与v1签名，不能随意用现代签名器重新签名 |
 | `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | 签名与已装版本不同。使用原签名密钥重建；或确认已备份后，在相机应用管理中卸载同包名旧应用再安装。卸载会清除应用设置 |
 | 录像设置灰色 | 进入动态影像 P/A/S/M 待机；具体档位取决于格式、当前PAL/NTSC和相机条件 |
-| 0.3.0 预览提示未生效 | 不会提交失败的选择；重试，或按 MENU 返回。请记录发生在拍照还是录像待机，实机行为仍待验证 |
+| 0.3.0 预览提示未生效 | 不会提交失败的选择；重试，或按 MENU 返回。请记录发生在拍照还是录像待机 |
 | ACROS 不是纯黑白 | 检查强度是否100% |
 | 颜色异常 | 正常退出应用并重启相机，再检查原机设置；不要靠修改固件或恢复出厂设置排查本应用 |
+
+上一版 [0.2.0-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.2.0-alpha) 保留供回退，支持相同的 15 个滤镜。
 
 从本版回退到 0.1.3 前，先选择「富士 PROVIA」并正常退出，避免旧版读取不支持的理光滤镜 ID。
 

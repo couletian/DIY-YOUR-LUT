@@ -2,14 +2,14 @@
 
 [Project](../README.en.md) · [中文](INSTALL.zh-CN.md) · [日本語](INSTALL.ja.md)
 
-This guide distinguishes **published 0.2.0-alpha / on-camera 0.2a** from **local development 0.3.0-alpha / 0.3a**. Section 0 still downloads 0.2.0; the local build/install examples in sections 3 and 5 use the unpublished, hardware-untested 0.3.0 build. Historical tests used an a5100 with firmware 1.10 and Android 2.3.7. macOS builds and Wi-Fi installation were exercised for earlier versions; equivalent Windows/Linux instructions have not had the same end-to-end hardware test.
+This guide uses **published 0.3.0-alpha / on-camera 0.3a**, available as an APK download or a local build. In-place installation and startup passed on an a5100 with firmware 1.10 and Android 2.3.7, and the user gave general on-camera confirmation of this UI update. macOS building and Wi-Fi installation have been exercised; equivalent Windows/Linux instructions have not had the same end-to-end hardware test.
 
-**0.2.0-alpha renames the app to 胶片工坊 / Film Studio while retaining the package and certificate for `install -r` updates. Added Ricoh styles preserve upstream parameters at 100%; all fifteen styles share the four strengths and still/movie menus. The combined build installed and launched on the a5100 with selected parameter-application logs; saved media from this version remain unverified, and older evidence does not validate every new combination.**
+**Film Studio retains the package and signing certificate for `install -r` updates. All fifteen Fujifilm-reference/Ricoh styles share four strengths and still/movie menus. Version 0.3.0 preserves all existing color parameters and adds live previews, on-demand loading and distinct badges. Device evidence includes all fifteen successful parameter applications and general user confirmation, not individual verification of every saved-photo/video combination.**
 
 ## 0. Install the released APK directly
 
 1. Read [camera compatibility](../README.en.md#compatibility) for your model and intended features.
-2. Download **[FilmStudio-0.2.0-alpha-movie.apk](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/download/v0.2.0-alpha/FilmStudio-0.2.0-alpha-movie.apk)** from [Releases → Assets](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.2.0-alpha). The Source code ZIP is not an installer.
+2. Download **[FilmStudio-0.3.0-alpha-movie.apk](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/download/v0.3.0-alpha/FilmStudio-0.3.0-alpha-movie.apk)** from [Releases → Assets](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.3.0-alpha). The Source code ZIP is not an installer.
 3. Download `SHA256SUMS.txt` too. Check the APK with `shasum -a 256` on macOS, `sha256sum` on Linux, or `Get-FileHash -Algorithm SHA256` in PowerShell. A checksum verifies file identity, not permission or compatibility.
 4. Install [Android Platform-Tools / adb](https://developer.android.com/tools/releases/platform-tools) on the computer. First-time users follow section 4 to enable Wi-Fi ADB and section 5 to install; if ADB already works, go to section 5.
 5. **Installing a released APK requires no Python, Java, Apktool or private signing key.** Sections 1–3 are for people who want to build it themselves.
@@ -20,7 +20,7 @@ If the terminal is in the folder containing the downloaded APK:
 
 ```sh
 adb connect CAMERA_IP:5555
-adb -s CAMERA_IP:5555 install -r FilmStudio-0.2.0-alpha-movie.apk
+adb -s CAMERA_IP:5555 install -r FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 Replace `CAMERA_IP` with the camera's current address. Wait for `Success`, then open「胶片工坊」from the camera's app list. The `output/` path in section 5 refers to local build output; use your actual download path when installing a release.
@@ -137,9 +137,9 @@ pmca-gui also offers **Select an apk → Open apk... → Install selected app** 
 
 ## 6. Controls and first test
 
-**New preview controls in local 0.3.0, not hardware-tested:** The filter browser keeps the live camera image visible. Move the highlight with directional buttons or the dial, then pause to preview. Rapid navigation waits 120 ms and applies only the last choice; actual display latency also depends on the camera. Press center to confirm and save. Back/cancel or a half-shutter exit restores the look active when the browser opened. Confirm before taking a photograph or pressing MOVIE so that an unconfirmed preview is not mistaken for a saved choice.
+**Preview controls in 0.3.0:** The filter browser keeps the live camera image visible. Move the highlight with directional buttons or the dial, then pause to preview. Rapid navigation waits 120 ms and applies only the last choice; actual display latency also depends on the camera. Press center to confirm and save. Back/cancel or a half-shutter exit restores the look active when the browser opened. Confirm before taking a photograph or pressing MOVIE so that an unconfirmed preview is not mistaken for a saved choice.
 
-Fifteen badges use distinct abbreviations and colors as identifiers, not sample images. Parameters load on first use of each look/strength pair and are then reused; existing color parameters stay unchanged. Startup and switching times have not been measured. **The downloaded 0.2.0 APK does not include these additions.**
+Fifteen badges use distinct abbreviations and colors as identifiers, not sample images. Parameters load on first use of each look/strength pair and are then reused; existing color parameters stay unchanged. Startup and switching times have not been measured. The a5100 user gave general on-camera confirmation of this UI update; see the [validation record](VALIDATION.md).
 
 1. In still preview or movie standby, press the **center button** to select a look. MENU page 1 also has the「胶片风格」entry. The fifteen choices use 富士 (Fujifilm) and 理光 (Ricoh) prefixes.
 2. MENU page 1 →「滤镜强度」sets 30/50/70/100%. Default 100%; a normal exit saves it. For portraits, compare 30% and 50%.
@@ -158,9 +158,11 @@ Fifteen badges use distinct abbreviations and colors as identifiers, not sample 
 | Certificate parse / DEXOPT failure | Use the documented build tools. API 10 needs compatible DEX 035 and v1 signing; do not casually re-sign with a modern default signer |
 | `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | Signing key differs. Rebuild with the original key, or back up and uninstall the old same-package app using camera app management before installing. Uninstalling clears app settings |
 | Gray video settings | Select movie P/A/S/M standby; available profiles still depend on format, PAL/NTSC and camera conditions |
-| 0.3.0 reports that preview was not applied | The failed choice is not committed. Retry or press MENU to return; report whether this occurred in still preview or movie standby. Hardware behavior remains unverified |
+| 0.3.0 reports that preview was not applied | The failed choice is not committed. Retry or press MENU to return; report whether this occurred in still preview or movie standby |
 | ACROS retains color | Set strength to 100% |
 | Unexpected color | Exit normally and restart the camera, then inspect native settings; firmware modifications and factory resets are not troubleshooting steps for this app |
+
+The previous [0.2.0-alpha release](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.2.0-alpha) remains available for rollback and supports the same fifteen presets.
 
 Before rolling back to 0.1.3, select Fujifilm PROVIA and exit normally so the old app does not encounter an unsupported Ricoh preset ID.
 

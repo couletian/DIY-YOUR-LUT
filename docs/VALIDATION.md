@@ -11,6 +11,8 @@ Device: one Sony a5100 / ILCE-5100, firmware 1.10, Android 2.3.7 / API 10. These
 | 0.1.1 / 0.1b | 10 个滤镜切换，照片与一段黑白视频保存验证 | Ten selections applied; JPEGs and one monochrome clip inspected | 10種類の切り替え、JPEG と白黒動画1本を確認 |
 | 0.1.2 / 0.1c | 录像格式／画质菜单获用户确认 | User confirmed movie format/quality controls | 動画形式・画質メニューの操作を利用者が確認 |
 | 0.1.3 / 0.1d | 安装、启动、默认风格成功；新操作获用户总体确认 | Install, startup and default look verified; general user confirmation of new controls | 導入・起動・初期フィルターを確認。新操作について利用者の総合的確認あり |
+| 0.2.0 / 0.2a | 合并版安装、启动与部分参数应用成功 | Combined build installed, launched and applied selected presets | 統合版の導入・起動・一部適用を確認 |
+| 0.3.0 / 0.3a | 安装、启动、15 个参数应用成功；界面更新获用户实机总体确认 | Install, startup and all fifteen parameter applications passed; general on-camera user confirmation of UI changes | 導入・起動・全15種類の適用を確認。UI 更新に利用者の総合的な実機確認あり |
 
 **0.1b saved-output measurements / 已保存文件检查 / 保存ファイルの確認：**
 
@@ -25,13 +27,19 @@ English: The clip demonstrates that monochrome processing reached saved video, n
 
 日本語：この動画は白黒処理が保存映像に反映された証拠であり、富士フイルム ACROS との正確な一致を示すものではありません。0.1b の結果は、0.1d の全組み合わせを確認したことにはなりません。アプリ内再生は写真のみで、動画は標準の対応形式の再生画面で確認します。個人の素材、機器ログ、撮影情報は公開しません。
 
-## 0.3.0-alpha / 本地开发版 / Local development / ローカル開発版
+## 0.3.0-alpha / 已发布版本 / Published release / 公開版
 
-中文：0.3.0（机内显示 `0.3a`）目前为本地开发版本，未发布。新增选择页实时取景、停留预览、中心键确认和返回恢复；15 个滤镜使用不同的字母／颜色图标。快速选择会取消上一次尚未执行的预览，等待 120 ms 后仅应用最后一项；确认时立即处理当前项，应用失败不提交该选择。关闭或暂停菜单会取消待执行预览，并尝试恢复进入菜单时已确认的滤镜。**这些菜单生命周期、实机画面、拍照／录像保存与响应耗时仍未验证；120 ms 不是实测延迟。**
+`FilmStudio-0.3.0-alpha-movie.apk` — SHA-256:
 
-English: 0.3.0 (on-camera `0.3a`) is a local, unpublished development build. It adds live camera view while browsing, preview on highlight, center confirmation, cancellation restore, and fifteen distinct color/letter badges. Rapid selections cancel pending preview work and apply only the latest choice after 120 ms; confirmation flushes the current choice immediately and does not commit a failed application. Closing or pausing the browser cancels queued preview work and attempts to restore the look committed before entry. **Menu lifecycle behavior, the actual camera display, saved photographs/video and response times remain unverified. The 120 ms setting is not measured latency.**
+```text
+14d8558687b62f379d60119f2b363443e6d57acdff9a1c19ecf9e64dfb7dcaf1
+```
 
-日本語：0.3.0（カメラ内表示 `0.3a`）は未公開のローカル開発版です。一覧中のライブビュー、選択項目のプレビュー、中央ボタンでの確定、キャンセル時の復帰、15種類の色・略称アイコンを追加します。連続操作では未実行のプレビューを取り消し、120 ms後に最後の項目だけを適用します。確定時は現在の項目をすぐ処理し、適用に失敗した選択は保存しません。メニュー終了・一時停止時に予約処理を取り消し、開く前の確定済みフィルターへの復帰を試みます。**メニューの動作、実際の画面、写真／動画保存、応答時間は実機未検証です。120 msは実測の遅延ではありません。**
+中文：0.3.0（机内显示 `0.3a`）为已发布的实验版本。新增选择页实时取景、停留预览、中心键确认和返回恢复；15 个滤镜使用不同的字母／颜色图标。快速选择会取消上一次尚未执行的预览，等待 120 ms 后仅应用最后一项；确认时立即处理当前项，应用失败不提交该选择。关闭或暂停菜单会取消待执行预览，并尝试恢复进入菜单时已确认的滤镜。**同一签名 APK 已成功覆盖安装，读回版本为 `0.3a`，启动成功，运行日志记录了全部 15 个滤镜参数应用成功。针对 ACROS 停留预览、返回恢复、图标区分和操作流畅度的检查，用户反馈“实体机子检测没问题”；这属于本次界面更新的总体实机确认。未逐项检验全部菜单生命周期边界或本版照片／录像保存组合；120 ms 是代码设置，不是实测延迟。**
+
+English: 0.3.0 (on-camera `0.3a`) is a published experimental release. It adds live camera view while browsing, preview on highlight, center confirmation, cancellation restore, and fifteen distinct color/letter badges. Rapid selections cancel pending preview work and apply only the latest choice after 120 ms; confirmation flushes the current choice immediately and does not commit a failed application. Closing or pausing the browser cancels queued preview work and attempts to restore the look committed before entry. **The same signed APK installed successfully in place, read back as `0.3a`, launched successfully, and logged successful parameter application for all fifteen presets. In response to checks of ACROS highlight preview, cancellation restore, distinct badges and responsiveness, the user reported no on-camera problems. This is general device confirmation of the UI update, not individual verification of every menu lifecycle edge case or saved-photo/video combination in this release. The 120 ms setting is not measured latency.**
+
+日本語：0.3.0（カメラ内表示 `0.3a`）は公開済みの実験版です。一覧中のライブビュー、選択項目のプレビュー、中央ボタンでの確定、キャンセル時の復帰、15種類の色・略称アイコンを追加します。連続操作では未実行のプレビューを取り消し、120 ms後に最後の項目だけを適用します。確定時は現在の項目をすぐ処理し、適用に失敗した選択は保存しません。メニュー終了・一時停止時に予約処理を取り消し、開く前の確定済みフィルターへの復帰を試みます。**同じ署名 APK の上書き導入に成功し、インストール済み版を `0.3a` と確認しました。起動成功と全15種類のパラメータ適用成功を記録しています。ACROS の選択中プレビュー、キャンセル時の復帰、アイコンの区別、操作応答の確認に対し、利用者から実機で問題なしとの報告がありました。これは本 UI 更新の総合的な実機確認であり、メニューの全境界条件や本版の写真／動画保存の全組み合わせを個別に検証したものではありません。120 ms はコード上の設定値で、実測の遅延ではありません。**
 
 中文：参数改为按「滤镜＋强度」分别初始化，共 60 个独立数据类。首次选用只创建该组合的两个数组（矩阵和曲线，净数据 2,084 字节），避免在 `RicohHook` 初始化时创建全部 120 个数组（净数据 125,040 字节）；此字节数不包括对象、类或运行时开销。菜单可用性检查只识别 ID，不触发数据加载。全部既有色彩参数保留，生成数组已与公开 0.2.0 的 120 个编译数组逐项比较。最终签名 APK 已重新解码，全部 120 个数组与 0.2.0 逐项一致，15 个图标链接与资源、685 个签名条目及相同签名证书检查通过；生成代码的 11 项预览控制流程检查通过。**没有实机启动时间或提速百分比结论。**
 
@@ -39,7 +47,7 @@ English: Parameters initialize separately for each look/strength pair in 60 hold
 
 日本語：「フィルター＋強度」ごとに60個の独立したクラスでパラメータを初期化します。初回選択でその組み合わせの行列とカーブの2配列（データ部分2,084バイト）を作り、`RicohHook`で全120配列（同125,040バイト）を一括初期化しません。オブジェクト、クラス、実行環境の管理領域はこの数に含みません。メニューの利用可否判定はIDだけを確認し、配列を読み込みません。既存の色パラメータを維持し、生成配列を公開0.2.0の全120配列と照合しました。最終署名APKを再展開し、全120配列の0.2.0との完全一致、15種類のアイコン参照とリソース、685署名項目、同一署名証明書を確認しました。生成コードのプレビュー制御フロー11項目も検査済みです。**起動時間の実測や高速化率の主張はありません。**
 
-Before a camera-tested release, check still preview and movie standby separately: rapid movement followed by center; MENU/back and half-shutter cancellation; leaving and reopening the browser; preview-application failure; saved JPEGs and movies with the confirmed look; and cold/warm startup timing. Preserve private captures locally; do not attach them to public reports by default.
+Further regression work should separately cover still preview and movie standby, rapid movement followed by center, half-shutter cancellation, repeated browser exit/re-entry, preview-application failure, saved JPEGs and movies with the confirmed look, and cold/warm startup timing. General user confirmation is not a recorded pass for every such case. Private captures, device logs, addresses and personal paths are not included in the release.
 
 ## 0.2.0-alpha / 胶片工坊 / Film Studio
 
@@ -98,9 +106,9 @@ Optional compiled-payload regression check after decompiling the signed APK:
 
 ```sh
 java -jar inputs/apktool.jar d -r output/FilmStudio-0.3.0-alpha-movie.apk -o build-local/verify-030
-python tools/check_combined.py --decoded build-local/verify-030 --upstream-hook inputs/upstream/src/smali/RicohHook.smali
+python tools/check_combined.py --decoded build-local/verify-030 --upstream-hook inputs/upstream/src/smali/RicohHook.smali --previous-decoded PATH_TO_DECODED_020
 python tools/check_live_preview.py build-local/verify-030
-python -m unittest discover -s tools -p test_filter_icons.py --previous-decoded PATH_TO_DECODED_020
+python -m unittest discover -s tools -p test_filter_icons.py
 ```
 
 Use a fresh verification directory. Replace `PATH_TO_DECODED_020` with a separately decoded released 0.2.0 APK to compare all 120 arrays. If that reference is unavailable, omit `--previous-decoded`; the check still compares the final holder arrays against the local fitted profiles and pinned Ricoh source. A decoded 0.1.3 reference is also accepted for the eighty earlier Fujifilm arrays. These checks also reject eager initialization in the hook or preset-availability lookup and verify each holder/reference pair. They read local files and do not connect to the camera.

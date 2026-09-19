@@ -4,9 +4,9 @@
 
 面向 **Sony a5100 / ILCE-5100** 的非官方胶片风格实验工具。参考 [bonyback1 的 Ricoh 模组](https://github.com/bonyback1/sony-pmca-ricoh-mod) 的硬件色彩处理方法，并以 [富士公开的 GFX ETERNA 55 LUT](https://www.fujifilm-x.com/global/support/download/lut/) 为色彩研究参考，提供照片与实验性录像效果。
 
-**已发布版本：0.2.0-alpha（机内 0.2a）；本地开发版本：0.3.0-alpha（机内 0.3a，尚未发布、未实机验证）。** 应用名称为「胶片工坊」，文档提供三种语言，当前相机应用界面主要为中文。下方下载链接仍指向可用的 0.2.0。
+**已发布版本：0.3.0-alpha（机内 0.3a）。** 应用名称为「胶片工坊」，文档提供三种语言，当前相机应用界面主要为中文。本次更新增加切换预览、按需加载和不同滤镜图标，已获得 a5100 用户的实机总体确认。
 
-**0.2.0 更名为「胶片工坊」，合并 10 个富士参考风格与 5 个上游理光／街头风格，共 15 个。** 相机菜单以「富士」「理光」前缀区分。包名与签名沿用旧版「富士风格」，可覆盖更新；新合并版已在 a5100 上安装、启动，并观察到部分滤镜参数应用成功；0.2.0 的照片／录像保存尚待验证。原版 [0.1.3-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.1.3-alpha) 仍保留供回退。
+**0.2.0 更名为「胶片工坊」，合并 10 个富士参考风格与 5 个上游理光／街头风格，共 15 个。** 相机菜单以「富士」「理光」前缀区分。包名与签名沿用旧版「富士风格」，可覆盖更新；原有色彩参数保持不变。旧版 [0.2.0-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.2.0-alpha) 和 [0.1.3-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.1.3-alpha) 仍保留供回退。
 
 <a id="compatibility"></a>
 
@@ -29,19 +29,19 @@
 
 ## 下载与安装
 
-**[直接下载 APK：0.2.0-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/download/v0.2.0-alpha/FilmStudio-0.2.0-alpha-movie.apk)** · [发行说明与校验文件](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.2.0-alpha)
+**[直接下载 APK：0.3.0-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/download/v0.3.0-alpha/FilmStudio-0.3.0-alpha-movie.apk)** · [发行说明与校验文件](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.3.0-alpha)
 
-下载 `FilmStudio-0.2.0-alpha-movie.apk` 后，按照[中文安装教程](docs/INSTALL.zh-CN.md)连接相机并安装，无需自己编译。**Code → Download ZIP 是源码，不是安装包。**
+下载 `FilmStudio-0.3.0-alpha-movie.apk` 后，按照[中文安装教程](docs/INSTALL.zh-CN.md)连接相机并安装，无需自己编译。**Code → Download ZIP 是源码，不是安装包。**
 
 本发行版为非官方实验版本，仅有上文所列的 a5100 实机验证。APK 包含 Sony 基础应用内容和由富士公开 LUT 拟合出的参数；未确认针对这些第三方材料改编、再分发的独立授权。发布不表示获得 Sony 或 FUJIFILM 许可，也不保证免责；[版权与许可范围](LICENSING.md)单独说明各部分的权利。官方原始 LUT 和签名私钥不提供下载。
 
 → **[中文完整安装教程](docs/INSTALL.zh-CN.md)**：准备输入 → 本地构建 → 首次启用连接 → Wi-Fi ADB 安装 → 相机操作 → 更新与故障排查。
 
-已有自行合法构建的本地 0.3.0 APK、且相机已启用 Wi-Fi ADB 时：
+下载 APK 后，在文件所在目录运行以下命令（相机须已启用 Wi-Fi ADB）：
 
 ```sh
 adb connect CAMERA_IP:5555
-adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.3.0-alpha-movie.apk
+adb -s CAMERA_IP:5555 install -r FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 **IP 与隐私：** `CAMERA_IP` 只是占位符，必须替换为你自己的相机在 Tweak → Developer 中当前显示的 IP；不要原样输入，也不要照抄他人的地址。保留后面的 `:5555` 端口。公开教程使用占位符；分享截图或日志时，请遮住或删除真实 IP。
@@ -52,14 +52,14 @@ adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.3.0-alpha-movie.apk
 
 **不需要。已签名 APK 可以通过教程中的安装方式直接安装，能否运行仍取决于机型和环境。** 接收者不需要 Python、Java、Apktool 或签名私钥。只有自行修改和生成 APK 时，才需要本地构建章节；自行构建也不会自动解决第三方许可问题。
 
-## 0.3.0 本地开发版的变化
+## 0.3.0 的变化
 
 - 滤镜选择页保留相机实时取景。用方向键或拨轮移动到滤镜后，停留片刻即可预览；中心键确认，返回／取消恢复打开列表前的滤镜。请先确认，再拍照或按 MOVIE。
 - 快速浏览时只应用最后停留的选择；代码设置了 120 ms 的等待，用于减少连续写入。这不是实机响应时间的保证。
 - 15 个滤镜分别使用带字母缩写和颜色的图标，方便辨认；图标不是实拍效果样张。
 - 按首次选用的「滤镜＋强度」加载矩阵与曲线，之后复用，避免启动时一次初始化全部组合。原有 15 个滤镜、四档强度的色彩参数保持不变。
 
-**这些变化尚未通过相机实测。** 预览、取消恢复、照片／录像保存，以及启动和切换耗时，都需要在本版上验证；不把代码优化写成已测得的提速。0.2.0 下载包不包含这些新增功能。
+**本次界面更新已获 a5100 用户实机总体确认。** 覆盖安装、启动和 15 个滤镜参数应用均有成功记录。预览、取消恢复、图标和操作流畅度检查后，用户反馈实机检测没有问题；未测量启动／切换耗时，也未逐项检验本版所有照片／录像保存组合。
 
 ## 功能
 
@@ -81,6 +81,8 @@ adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.3.0-alpha-movie.apk
 - 0.1.1：10 个风格菜单成功切换；PROVIA 彩色与 ACROS 黑白 JPEG 正常保存；ACROS XAVC S 1080p59.94 视频成功保存并完整解码。
 - 0.1.2：录像格式和画质菜单获得用户可用性确认；尚未逐一分析所有格式生成的文件。
 - 0.1.3：安装、启动及默认滤镜应用已验证，中心键与强度操作得到用户总体确认；未逐一检验每种风格、强度、录像格式的最终文件。
+- 0.2.0：合并版安装、启动及部分滤镜参数应用成功；照片／录像保存仍限于历史验证范围。
+- 0.3.0：覆盖安装、启动及 15 个滤镜参数应用成功；本次预览、取消恢复、图标和流畅度更新获用户实机总体确认。未测量耗时，也未逐项验证所有保存组合。
 
 **应用内回放目前只显示照片。** 查看录像请退出应用，进入原机回放，并选择与文件对应的 XAVC S / AVCHD / MP4 观看模式。详情见 [验证说明](docs/VALIDATION.md)。
 

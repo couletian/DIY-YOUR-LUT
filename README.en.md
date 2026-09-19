@@ -4,9 +4,9 @@
 
 An unofficial film-look experiment for the **Sony a5100 / ILCE-5100**. It references the hardware color-processing approach in [bonyback1's Ricoh mod](https://github.com/bonyback1/sony-pmca-ricoh-mod) and uses [Fujifilm's publicly available GFX ETERNA 55 LUTs](https://www.fujifilm-x.com/global/support/download/lut/) as color-research references for photographs and experimental video.
 
-**Published: 0.2.0-alpha (on-camera 0.2a). Local development: 0.3.0-alpha (0.3a), not yet published or hardware-tested.** The app is named 胶片工坊 / Film Studio. Documentation is available in three languages; the camera UI is currently primarily Chinese. Download links below still point to the available 0.2.0 release.
+**Published: 0.3.0-alpha (on-camera 0.3a).** The app is named 胶片工坊 / Film Studio. Documentation is available in three languages; the camera UI is currently primarily Chinese. This update adds live filter previews, on-demand loading and distinct badges, with general on-camera confirmation from the a5100 user.
 
-**Version 0.2.0 renamed the app to Film Studio (胶片工坊), combining ten Fujifilm-reference and five upstream Ricoh/street-style presets, fifteen in total.** Menu labels use 富士 / 理光 prefixes. The package and signing certificate are retained for an in-place update from 富士风格. The combined build installed and launched on the a5100, with successful parameter-application logs for selected presets; saved photographs/video from 0.2.0 remain unverified. [0.1.3-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.1.3-alpha) remains available for rollback.
+**Version 0.2.0 renamed the app to Film Studio (胶片工坊), combining ten Fujifilm-reference and five upstream Ricoh/street-style presets, fifteen in total.** Menu labels use 富士 / 理光 prefixes. The package and signing certificate are retained for an in-place update from 富士风格; existing color parameters are unchanged. [0.2.0-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.2.0-alpha) and [0.1.3-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.1.3-alpha) remain available for rollback.
 
 <a id="compatibility"></a>
 
@@ -29,19 +29,19 @@ Candidates come from the [upstream model list](https://github.com/bonyback1/sony
 
 ## Download and installation
 
-**[Download APK: 0.2.0-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/download/v0.2.0-alpha/FilmStudio-0.2.0-alpha-movie.apk)** · [Release notes and checksum files](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.2.0-alpha)
+**[Download APK: 0.3.0-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/download/v0.3.0-alpha/FilmStudio-0.3.0-alpha-movie.apk)** · [Release notes and checksum files](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.3.0-alpha)
 
-Download `FilmStudio-0.2.0-alpha-movie.apk`, then follow the [English installation guide](docs/INSTALL.en.md) to connect and install. No local compilation is required. **Code → Download ZIP contains source, not the installer.**
+Download `FilmStudio-0.3.0-alpha-movie.apk`, then follow the [English installation guide](docs/INSTALL.en.md) to connect and install. No local compilation is required. **Code → Download ZIP contains source, not the installer.**
 
 This is an unofficial experimental release with only the a5100 evidence described above. The APK contains Sony base-app material and parameters fitted from publicly available Fujifilm LUTs. A separate grant to adapt and redistribute those third-party materials has not been established. Publication does not represent Sony/FUJIFILM permission or guarantee immunity; [license scope](LICENSING.md) distinguishes the rights in each part. Original official LUT files and signing private keys are not distributed.
 
 → **[Complete English installation guide](docs/INSTALL.en.md)**: inputs → local build → first-time connection → Wi-Fi ADB installation → camera controls → updates and troubleshooting.
 
-With your own lawfully built local 0.3.0 APK and Wi-Fi ADB already enabled:
+After downloading the APK, run these commands from its directory with Wi-Fi ADB already enabled on the camera:
 
 ```sh
 adb connect CAMERA_IP:5555
-adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.3.0-alpha-movie.apk
+adb -s CAMERA_IP:5555 install -r FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 **IP address and privacy:** `CAMERA_IP` is a placeholder. Replace it with the current IP shown on your own camera in Tweak → Developer; do not type the placeholder literally or copy someone else's address. Keep the `:5555` port. Public instructions use a placeholder; hide or remove actual IP addresses before sharing screenshots or logs.
@@ -52,14 +52,14 @@ First-time users also need the preparation steps in the guide.
 
 **No. A signed APK can be installed through the documented procedure; runtime compatibility still depends on the camera and environment.** Recipients do not need Python, Java, Apktool or the private signing key. The local build chapters are for modifying or generating an APK yourself; doing so does not itself resolve third-party permissions.
 
-## Changes in the local 0.3.0 development build
+## Changes in 0.3.0
 
 - The filter browser keeps the live camera image visible. Move with the directional buttons or dial and pause to preview; press center to confirm, or back/cancel to restore the look active when the browser opened. Confirm before taking a photograph or pressing MOVIE.
 - Rapid browsing applies only the last highlighted choice after a 120 ms debounce. This delay is a code setting, not a measured camera response time.
 - Fifteen different color-and-letter badges help identify the looks. They are identifiers, not sample photographs.
 - Each look/strength matrix and curve pair loads on first selection and is reused, instead of initializing every combination at startup. All existing color parameters for fifteen looks and four strengths are preserved.
 
-**These changes have not been tested on a camera.** Live preview, cancellation, saved photographs/video, and startup/switching times still need verification in this build. No measured speedup is claimed. The downloadable 0.2.0 APK does not include these additions.
+**The a5100 user gave general on-camera confirmation of this UI update.** Installation, startup and successful parameter application for all fifteen looks were recorded. Following checks of preview, cancellation restore, badges and responsiveness, the user reported no problems. Startup/switching times were not measured, and all saved-photo/video combinations have not been individually verified in this version.
 
 ## Features
 
@@ -81,6 +81,8 @@ Tested on one **a5100, firmware 1.10, Android 2.3.7 / API 10**. Other models are
 - 0.1.1: all ten look selections applied; PROVIA color and ACROS monochrome JPEGs saved; an ACROS XAVC S 1080p59.94 clip saved and fully decoded.
 - 0.1.2: the user confirmed format/quality menus were usable. Every encoded format has not been inspected.
 - 0.1.3: installation, startup and default-look application verified; the user gave general confirmation of the new controls. Every look/strength/format combination has not been tested in saved media.
+- 0.2.0: combined build installed and launched, with successful application of selected presets; saved-media evidence remains limited to the historical tests.
+- 0.3.0: in-place installation, startup and all fifteen parameter applications succeeded; the user gave general on-camera confirmation of the preview, cancellation, badge and responsiveness update. No timing measurements or exhaustive saved-output tests were performed.
 
 **In-app playback currently lists photographs only.** Exit to native playback and choose the appropriate XAVC S, AVCHD or MP4 view to see movies. See [validation notes](docs/VALIDATION.md).
 
