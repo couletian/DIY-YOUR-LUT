@@ -2,7 +2,7 @@
 
 [プロジェクト](../README.ja.md) · [中文](INSTALL.zh-CN.md) · [English](INSTALL.en.md)
 
-対象は **0.2.0-alpha／カメラ内表示0.2a**。実機は a5100、ファームウェア1.10、Android2.3.7です。macOS でのビルドと Wi-Fi インストールを確認しました。Windows/Linux の同等手順は、同じ実機で全工程を検証していません。
+本書では**公開版0.2.0-alpha／カメラ内表示0.2a**と、**ローカル開発版0.3.0-alpha／0.3a**を区別します。第0節のダウンロードは0.2.0、第3・5節のローカルビルド・導入例は未公開・実機未検証の0.3.0です。過去の実機検証はa5100、ファームウェア1.10、Android2.3.7で行い、旧版のmacOSビルドとWi-Fi導入を確認しました。Windows/Linuxの同等手順は、同じ実機で全工程を検証していません。
 
 **0.2.0-alpha では「胶片工坊 / Film Studio」に改名し、同じパッケージと署名で `install -r` 更新ができます。追加したリコー風は100%で上流の値を維持し、15種類すべてが4段階の強度と写真／動画メニューを共有します。統合版は a5100 で導入・起動と一部の適用ログを確認しました。本版の保存ファイルは未検証で、旧版の記録は新しい全組み合わせの検証を意味しません。**
 
@@ -86,7 +86,7 @@ java -jar inputs/apktool.jar --version
 
 ```sh
 python tools/fit_luts.py inputs/luts/gfx-eterna-55-3d-lut-v110/33Grid/F-Log2 .
-python tools/build_apk.py --input inputs/base.apk --apktool inputs/apktool.jar --upstream-hook inputs/upstream/src/smali/RicohHook.smali --work build-local/decoded-020 --movie
+python tools/build_apk.py --input inputs/base.apk --apktool inputs/apktool.jar --upstream-hook inputs/upstream/src/smali/RicohHook.smali --work build-local/decoded-030 --movie
 python tools/check_strength.py
 python tools/check_build.py
 ```
@@ -94,7 +94,7 @@ python tools/check_build.py
 最初のコマンドで `profiles/`、`output/` のプレビュー LUT、`validation/` の数値評価を生成します。続いて強度の検査、APK のビルド・署名・検証を実行します。生成先：
 
 ```text
-output/FilmStudio-0.2.0-alpha-movie.apk
+output/FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 作業ディレクトリは未作成か空である必要があります。再ビルドでは新しい作業先を指定します。`--movie` は本書の写真・動画機能を有効にします。省略すると写真用の版になります。
@@ -120,7 +120,7 @@ macOS で USB が使用中になる場合は、写真、イメージキャプチ
 ```sh
 adb connect CAMERA_IP:5555
 adb devices
-adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.2.0-alpha-movie.apk
+adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 対象が `device` と表示され、最後に `Success` が出ればインストール完了です。カメラのアプリ一覧から **胶片工坊** を起動します。名称と大部分のメニューは中国語です。
@@ -136,6 +136,10 @@ adb -s CAMERA_IP:5555 shell am start -W -n com.yuki.imaging.app.pictureeffectplu
 pmca-gui の **Select an apk → Open apk... → Install selected app** でローカル APK を USB インストールする方法もあります。ただし本プロジェクトで確認した更新経路は Wi-Fi ADB であり、すべての USB インストーラーと署名の組み合わせを保証しません。
 
 ## 6. 操作と最初の確認
+
+**ローカル0.3.0の追加操作（実機未検証）：** フィルター一覧を開いてもライブビューを表示します。方向キーやダイヤルで選択項目を移動し、止めるとプレビューします。連続操作では120 ms待ち、最後の項目だけを適用しますが、実際の表示遅延はカメラにも依存します。中央ボタンで確定・保存。戻る／キャンセル、または半押しで閉じる場合は一覧を開く前のフィルターへ戻します。未確定のプレビューを保存済みの選択と混同しないよう、撮影やMOVIE操作の前に確定してください。
+
+15種類のアイコンは異なる略称と色による識別表示で、実写の作例ではありません。「フィルター＋強度」のパラメータは初回使用時に読み込み、以後再利用します。既存の色パラメータは維持し、起動・切り替え時間は未測定です。**ダウンロードした0.2.0 APKには、この追加機能は含まれません。**
 
 1. 写真プレビュー／動画待機中に**中央ボタン**でフィルターを選びます。MENU 1ページ目の「胶片风格」からも開けます。「富士」「理光」の接頭辞が付いた15項目を選べます。
 2. 「滤镜强度」で30/50/70/100%を選択。初期値100%、通常終了時に保存します。人物では30%と50%を比較してください。
@@ -154,6 +158,7 @@ pmca-gui の **Select an apk → Open apk... → Install selected app** でロ�
 | 署名解析／DEXOPT エラー | 指定ツールを使用。API10互換DEX035とv1署名が必要です。現代的な署名ツールの既定値で再署名しないでください |
 | INSTALL_FAILED_UPDATE_INCOMPATIBLE | 鍵が異なります。元の鍵で再ビルドするか、バックアップ後にカメラのアプリ管理で旧版を削除してから導入します。削除するとアプリ設定は失われます |
 | 動画設定がグレー | 動画 P/A/S/M の待機へ。形式、PAL/NTSC、機種条件により選択肢は異なります |
+| 0.3.0でプレビュー未適用と表示 | 失敗した選択は保存しません。再試行するかMENUで戻り、写真・動画待機のどちらで発生したか記録してください。実機動作は未検証です |
 | ACROS に色が残る | 強度100%を選択 |
 | 色がおかしい | 通常終了してカメラを再起動し、標準設定を確認。本アプリの排障にファームウェア変更や初期化は行いません |
 

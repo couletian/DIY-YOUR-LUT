@@ -2,7 +2,7 @@
 
 [项目首页](../README.md) · [English](INSTALL.en.md) · [日本語](INSTALL.ja.md)
 
-本指南对应 **0.2.0-alpha / 机内 0.2a**。实机环境为 a5100 固件1.10、Android 2.3.7；macOS 构建与 Wi-Fi 安装已验证。Windows/Linux 的命令说明未做相同的实机全流程验证。
+本指南区分**已发布 0.2.0-alpha / 机内 0.2a** 与**本地开发 0.3.0-alpha / 机内 0.3a**。第 0 节继续下载 0.2.0；第 3、5 节的本地构建示例使用尚未发布、未实机验证的 0.3.0。历史实机环境为 a5100 固件1.10、Android 2.3.7；macOS 构建与 Wi-Fi 安装已有旧版验证。Windows/Linux 的命令说明未做相同的实机全流程验证。
 
 **0.2.0-alpha 更名为「胶片工坊」，保留旧版包名与签名，可用 `install -r` 覆盖更新。新增理光风格使用上游原参数，100% 不重新调色；四档强度、拍照和录像菜单共用。新合并版已在 a5100 上安装、启动，并有部分滤镜参数应用成功日志；旧版记录不代表本版所有照片／录像组合已验证。**
 
@@ -86,7 +86,7 @@ java -jar inputs/apktool.jar --version
 
 ```sh
 python tools/fit_luts.py inputs/luts/gfx-eterna-55-3d-lut-v110/33Grid/F-Log2 .
-python tools/build_apk.py --input inputs/base.apk --apktool inputs/apktool.jar --upstream-hook inputs/upstream/src/smali/RicohHook.smali --work build-local/decoded-020 --movie
+python tools/build_apk.py --input inputs/base.apk --apktool inputs/apktool.jar --upstream-hook inputs/upstream/src/smali/RicohHook.smali --work build-local/decoded-030 --movie
 python tools/check_strength.py
 python tools/check_build.py
 ```
@@ -94,10 +94,10 @@ python tools/check_build.py
 第一步生成本地 `profiles/` 参数、`output/` 预览 LUT 和 `validation/` 拟合报告；然后构建、签名并检查 APK。结果为：
 
 ```text
-output/FilmStudio-0.2.0-alpha-movie.apk
+output/FilmStudio-0.3.0-alpha-movie.apk
 ```
 
-`build-local/decoded-020` 必须为空或不存在。重复构建请指定一个新的工作目录。`--movie` 表示启用本指南的拍照和录像功能；省略它会生成仅拍照版本。
+`build-local/decoded-030` 必须为空或不存在。重复构建请指定一个新的工作目录。`--movie` 表示启用本指南的拍照和录像功能；省略它会生成仅拍照版本。
 
 **保管 `.private/signing.pem`。** 首次构建会自动生成签名密钥，之后更新必须保留同一密钥。不要上传密钥或把它交给其他使用者。不同人的签名不同，生成 APK 的 SHA-256 也会不同；本地报告中的哈希用于核对自己的构建；下载的发行 APK 应与 Releases 中的 SHA256SUMS.txt 核对。
 
@@ -120,7 +120,7 @@ macOS 发生 USB 占用时先关闭照片、图像捕捉及会访问相机的同
 ```sh
 adb connect CAMERA_IP:5555
 adb devices
-adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.2.0-alpha-movie.apk
+adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 预期 `adb devices` 中目标状态为 `device`，安装末尾显示 `Success`。相机应用程序列表 → **胶片工坊**。安装名称及大部分菜单为中文。
@@ -136,6 +136,10 @@ adb -s CAMERA_IP:5555 shell am start -W -n com.yuki.imaging.app.pictureeffectplu
 pmca-gui 的「Select an apk → Open apk... → Install selected app」可作为本地 APK 的 USB 安装尝试，但本项目更新路径以 Wi-Fi ADB 为已验证方式；无法保证每个 USB 安装器/签名组合都被接受。
 
 ## 6. 相机操作与首次自检
+
+**0.3.0 本地开发版新增的预览操作（未实机验证）：** 打开滤镜列表后保留实时取景；用方向键或拨轮移动选中项，停留后预览该滤镜。连续切换采用 120 ms 等待，只处理最后一项；实际显示延迟还取决于相机。按中心键确认并保存，返回／取消或半按快门退出时恢复打开列表前的滤镜。先确认，再拍照或按 MOVIE，避免把未确认的预览当成已保存的选择。
+
+15 个图标使用不同缩写与颜色，表示滤镜身份而非效果样张。每个「滤镜＋强度」的参数首次使用时加载，后续复用；原有色彩参数不变，实际启动和切换耗时尚未测量。**下载的 0.2.0 没有这些新增功能。**
 
 1. 拍照预览或录像待机按**中心键**选择风格。按 MENU 也可从首页进入「胶片风格」。列表包含「富士」与「理光」两组前缀，共 15 项。
 2. MENU 首页 →「滤镜强度」选择30/50/70/100%。初始100%，正常退出后保存。人像先对比30%与50%。
@@ -154,6 +158,7 @@ pmca-gui 的「Select an apk → Open apk... → Install selected app」可作�
 | `INSTALL_PARSE_FAILED_NO_CERTIFICATES` / `INSTALL_FAILED_DEXOPT` | 检查是否按固定版本工具构建；需要 API10兼容的DEX035与v1签名，不能随意用现代签名器重新签名 |
 | `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | 签名与已装版本不同。使用原签名密钥重建；或确认已备份后，在相机应用管理中卸载同包名旧应用再安装。卸载会清除应用设置 |
 | 录像设置灰色 | 进入动态影像 P/A/S/M 待机；具体档位取决于格式、当前PAL/NTSC和相机条件 |
+| 0.3.0 预览提示未生效 | 不会提交失败的选择；重试，或按 MENU 返回。请记录发生在拍照还是录像待机，实机行为仍待验证 |
 | ACROS 不是纯黑白 | 检查强度是否100% |
 | 颜色异常 | 正常退出应用并重启相机，再检查原机设置；不要靠修改固件或恢复出厂设置排查本应用 |
 

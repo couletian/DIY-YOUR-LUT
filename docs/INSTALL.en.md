@@ -2,7 +2,7 @@
 
 [Project](../README.en.md) · [中文](INSTALL.zh-CN.md) · [日本語](INSTALL.ja.md)
 
-For **0.2.0-alpha / on-camera 0.2a**. The tested device is an a5100 with firmware 1.10 and Android 2.3.7. Building on macOS and installing over Wi-Fi were exercised; equivalent Windows/Linux instructions have not had the same end-to-end hardware test.
+This guide distinguishes **published 0.2.0-alpha / on-camera 0.2a** from **local development 0.3.0-alpha / 0.3a**. Section 0 still downloads 0.2.0; the local build/install examples in sections 3 and 5 use the unpublished, hardware-untested 0.3.0 build. Historical tests used an a5100 with firmware 1.10 and Android 2.3.7. macOS builds and Wi-Fi installation were exercised for earlier versions; equivalent Windows/Linux instructions have not had the same end-to-end hardware test.
 
 **0.2.0-alpha renames the app to 胶片工坊 / Film Studio while retaining the package and certificate for `install -r` updates. Added Ricoh styles preserve upstream parameters at 100%; all fifteen styles share the four strengths and still/movie menus. The combined build installed and launched on the a5100 with selected parameter-application logs; saved media from this version remain unverified, and older evidence does not validate every new combination.**
 
@@ -86,7 +86,7 @@ java -jar inputs/apktool.jar --version
 
 ```sh
 python tools/fit_luts.py inputs/luts/gfx-eterna-55-3d-lut-v110/33Grid/F-Log2 .
-python tools/build_apk.py --input inputs/base.apk --apktool inputs/apktool.jar --upstream-hook inputs/upstream/src/smali/RicohHook.smali --work build-local/decoded-020 --movie
+python tools/build_apk.py --input inputs/base.apk --apktool inputs/apktool.jar --upstream-hook inputs/upstream/src/smali/RicohHook.smali --work build-local/decoded-030 --movie
 python tools/check_strength.py
 python tools/check_build.py
 ```
@@ -94,7 +94,7 @@ python tools/check_build.py
 The first command generates private local `profiles/`, preview LUTs in `output/`, and fitting metrics in `validation/`. The remaining commands check strengths, build/sign the APK, and verify the result:
 
 ```text
-output/FilmStudio-0.2.0-alpha-movie.apk
+output/FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 The work directory must be absent or empty. Use a new work directory for another build. `--movie` enables the still/video features covered here; omitting it produces the still-only variant.
@@ -120,7 +120,7 @@ Replace every `CAMERA_IP` with the address currently shown by your camera.
 ```sh
 adb connect CAMERA_IP:5555
 adb devices
-adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.2.0-alpha-movie.apk
+adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 The target should appear as `device`; installation should finish with `Success`. Open **胶片工坊** from the camera's application list. Its name and most menu labels are Chinese.
@@ -136,6 +136,10 @@ The native camera screen may block this command. Open the app manually instead; 
 pmca-gui also offers **Select an apk → Open apk... → Install selected app** for a local APK. You may try that USB route, but Wi-Fi ADB is the update method verified for this project. Acceptance of every USB installer/signature combination is not guaranteed.
 
 ## 6. Controls and first test
+
+**New preview controls in local 0.3.0, not hardware-tested:** The filter browser keeps the live camera image visible. Move the highlight with directional buttons or the dial, then pause to preview. Rapid navigation waits 120 ms and applies only the last choice; actual display latency also depends on the camera. Press center to confirm and save. Back/cancel or a half-shutter exit restores the look active when the browser opened. Confirm before taking a photograph or pressing MOVIE so that an unconfirmed preview is not mistaken for a saved choice.
+
+Fifteen badges use distinct abbreviations and colors as identifiers, not sample images. Parameters load on first use of each look/strength pair and are then reused; existing color parameters stay unchanged. Startup and switching times have not been measured. **The downloaded 0.2.0 APK does not include these additions.**
 
 1. In still preview or movie standby, press the **center button** to select a look. MENU page 1 also has the「胶片风格」entry. The fifteen choices use 富士 (Fujifilm) and 理光 (Ricoh) prefixes.
 2. MENU page 1 →「滤镜强度」sets 30/50/70/100%. Default 100%; a normal exit saves it. For portraits, compare 30% and 50%.
@@ -154,6 +158,7 @@ pmca-gui also offers **Select an apk → Open apk... → Install selected app** 
 | Certificate parse / DEXOPT failure | Use the documented build tools. API 10 needs compatible DEX 035 and v1 signing; do not casually re-sign with a modern default signer |
 | `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | Signing key differs. Rebuild with the original key, or back up and uninstall the old same-package app using camera app management before installing. Uninstalling clears app settings |
 | Gray video settings | Select movie P/A/S/M standby; available profiles still depend on format, PAL/NTSC and camera conditions |
+| 0.3.0 reports that preview was not applied | The failed choice is not committed. Retry or press MENU to return; report whether this occurred in still preview or movie standby. Hardware behavior remains unverified |
 | ACROS retains color | Set strength to 100% |
 | Unexpected color | Exit normally and restart the camera, then inspect native settings; firmware modifications and factory resets are not troubleshooting steps for this app |
 

@@ -9,6 +9,7 @@ import re
 import xml.etree.ElementTree as ET
 from film_profiles import read_array, ricoh_profiles
 from filter_strength import STRENGTHS, blend_profile
+from filter_icons import verify_icons
 
 ROOT = Path(__file__).resolve().parents[1]
 HOOK_PATH = 'smali/com/yuki/imaging/app/pictureeffectplus/shooting/camera/RicohHook.smali'
@@ -26,17 +27,63 @@ def fields(text):
     return result
 
 
+def compiled_profile_arrays(decoded, hook):
+    """Verify the final DEX has isolated initializers and valid lookup targets."""
+    initializer = re.search(r'^\.method [^\n]* <clinit>\(\)V\n(.*?)^\.end method',
+                            hook, re.M | re.S)
+    assert initializer, 'Missing hook initializer'
+    assert not re.search(r'new-array|fill-array-data|sget-object|invoke-', initializer[1]), \
+        'Hook still eagerly initializes preset data'
+    assert not fields(hook), 'Preset arrays must live in lazy holders'
+    predicate = re.search(r'^\.method [^\n]* isRicohPreset\(Ljava/lang/String;\)Z\n(.*?)^\.end method',
+                          hook, re.M | re.S)
+    assert predicate and not re.search(r'getRGBMatrix|getGammaBytes|sget-object', predicate[1]), \
+        'Availability checks must not load profile arrays'
+    references = re.findall(
+        r'sget-object v0, (L[^;]+\$Profile\d+_\d+;)->(sFuji\w+):(\[[IB])', hook)
+    assert len(references) == 120 and len(set(references)) == 120, \
+        'Every matrix/gamma lookup must target its own holder field exactly once'
+    expected = {}
+    for owner, name, kind in references:
+        assert name not in expected, 'Multiple owners for one profile field'
+        expected[name] = (owner, kind)
+    arrays = {}
+    holder_paths = sorted((decoded/HOOK_PATH).parent.glob('RicohHook$Profile*.smali'))
+    assert len(holder_paths) == 60, 'Expected one holder per preset/strength pair'
+    for path in holder_paths:
+        text = path.read_text()
+        owner = re.search(r'^\.class [^\n]* (L[^;]+;)$', text, re.M)[1]
+        assert owner == 'L' + path.relative_to(decoded/'smali').with_suffix('').as_posix() + ';'
+        members = re.findall(r'^\.field public static final (sFuji\w+):(\[[IB])$', text, re.M)
+        assert len(members) == 2 and {kind for name, kind in members} == {'[B', '[I'}
+        assert len(re.findall(r'^\.method ', text, re.M)) == 1
+        assert '<clinit>()V' in text and text.count('new-array ') == 2
+        assert not re.search(r'\bsget-object\b|\binvoke-', text), \
+            'A holder must not initialize other holders or execute app code'
+        initialized = fields(text)
+        assert set(initialized) == {name for name, kind in members}
+        stores = re.findall(r'sput-object v1, (L[^;]+;)->(sFuji\w+):(\[[IB])', text)
+        assert set(stores) == {(owner, name, kind) for name, kind in members}, \
+            'A holder must initialize its own declared fields'
+        for name, kind in members:
+            assert expected[name] == (owner, kind), 'Lookup/holder mismatch: ' + name
+            assert name not in arrays, 'Duplicate profile field: ' + name
+            arrays[name] = initialized[name]
+    assert set(arrays) == set(expected)
+    return arrays
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--decoded', type=Path, required=True,
                     help='Fresh apktool d -r output from the final signed APK')
     ap.add_argument('--upstream-hook', type=Path, required=True)
     ap.add_argument('--previous-decoded', type=Path,
-                    help='Optional decoded 0.1.3 build, to compare existing arrays')
+                    help='Optional decoded 0.1.3 or later build, to compare existing arrays')
     args = ap.parse_args()
     profiles = json.loads((ROOT/'profiles/film_studio.json').read_text())['presets']
     hook = (args.decoded/HOOK_PATH).read_text()
-    arrays = fields(hook)
+    arrays = compiled_profile_arrays(args.decoded, hook)
     assert len(profiles) == 15 and len(arrays) == 120
     for i, p in enumerate(profiles):
         for strength in STRENGTHS:
@@ -55,7 +102,8 @@ def main():
     ids = [p['id'] for p in profiles]
     assert [e.get('ItemId') for e in top] == ids
     assert [e.get('Value') for e in top] == ids
-    for method in ['getPresetIds', 'getRGBMatrix', 'getGammaBytes', 'getFilterName', 'getFilterGuide']:
+    assert verify_icons(args.decoded, profiles) == 15
+    for method in ['getPresetIds', 'getRGBMatrix', 'getGammaBytes', 'getFilterName', 'getFilterGuide', 'isRicohPreset']:
         body = re.search(r'^\.method [^\n]* ' + method + r'\([^\n]*\n(.*?)^\.end method', hook, re.M | re.S)
         assert body, method
         for preset_id in ids:
@@ -70,15 +118,24 @@ def main():
         assert old.encode() not in resources and old.encode('utf-16-le') not in resources
     previous_count = None
     if args.previous_decoded:
-        previous = fields((args.previous_decoded/HOOK_PATH).read_text())
-        assert len(previous) == 80
+        previous_hook = (args.previous_decoded/HOOK_PATH).read_text()
+        previous = fields(previous_hook)
+        if not previous:
+            previous = compiled_profile_arrays(args.previous_decoded, previous_hook)
+        assert len(previous) in (80, 120)
         for field, values in previous.items():
             assert arrays[field] == values, field
         previous_count = len(previous)
     report = dict(
         profiles=15, strengths=list(STRENGTHS), compiled_arrays_checked=len(arrays),
-        upstream_ricoh_full_strength_exact=True, previous_fuji_arrays_unchanged=previous_count,
+        lazy_profile_holders=60, hook_eager_profile_arrays=0,
+        first_selected_profile_array_bytes=2084, previous_eager_profile_array_bytes=125040,
+        startup_timing_measured=False,
+        upstream_ricoh_full_strength_exact=True,
+        previous_compiled_arrays_unchanged=previous_count,
+        previous_fuji_arrays_unchanged=min(previous_count, 80) if previous_count else None,
         menu_and_lookup_ids_match=True, renamed_resources=True,
+        distinct_filter_badges_checked=15,
         movie_standby_shortcut_present=True, hardware_verified=False,
     )
     (ROOT/'validation/combined-static.json').write_text(json.dumps(report, indent=2))

@@ -25,6 +25,22 @@ English: The clip demonstrates that monochrome processing reached saved video, n
 
 日本語：この動画は白黒処理が保存映像に反映された証拠であり、富士フイルム ACROS との正確な一致を示すものではありません。0.1b の結果は、0.1d の全組み合わせを確認したことにはなりません。アプリ内再生は写真のみで、動画は標準の対応形式の再生画面で確認します。個人の素材、機器ログ、撮影情報は公開しません。
 
+## 0.3.0-alpha / 本地开发版 / Local development / ローカル開発版
+
+中文：0.3.0（机内显示 `0.3a`）目前为本地开发版本，未发布。新增选择页实时取景、停留预览、中心键确认和返回恢复；15 个滤镜使用不同的字母／颜色图标。快速选择会取消上一次尚未执行的预览，等待 120 ms 后仅应用最后一项；确认时立即处理当前项，应用失败不提交该选择。关闭或暂停菜单会取消待执行预览，并尝试恢复进入菜单时已确认的滤镜。**这些菜单生命周期、实机画面、拍照／录像保存与响应耗时仍未验证；120 ms 不是实测延迟。**
+
+English: 0.3.0 (on-camera `0.3a`) is a local, unpublished development build. It adds live camera view while browsing, preview on highlight, center confirmation, cancellation restore, and fifteen distinct color/letter badges. Rapid selections cancel pending preview work and apply only the latest choice after 120 ms; confirmation flushes the current choice immediately and does not commit a failed application. Closing or pausing the browser cancels queued preview work and attempts to restore the look committed before entry. **Menu lifecycle behavior, the actual camera display, saved photographs/video and response times remain unverified. The 120 ms setting is not measured latency.**
+
+日本語：0.3.0（カメラ内表示 `0.3a`）は未公開のローカル開発版です。一覧中のライブビュー、選択項目のプレビュー、中央ボタンでの確定、キャンセル時の復帰、15種類の色・略称アイコンを追加します。連続操作では未実行のプレビューを取り消し、120 ms後に最後の項目だけを適用します。確定時は現在の項目をすぐ処理し、適用に失敗した選択は保存しません。メニュー終了・一時停止時に予約処理を取り消し、開く前の確定済みフィルターへの復帰を試みます。**メニューの動作、実際の画面、写真／動画保存、応答時間は実機未検証です。120 msは実測の遅延ではありません。**
+
+中文：参数改为按「滤镜＋强度」分别初始化，共 60 个独立数据类。首次选用只创建该组合的两个数组（矩阵和曲线，净数据 2,084 字节），避免在 `RicohHook` 初始化时创建全部 120 个数组（净数据 125,040 字节）；此字节数不包括对象、类或运行时开销。菜单可用性检查只识别 ID，不触发数据加载。全部既有色彩参数保留，生成数组已与公开 0.2.0 的 120 个编译数组逐项比较。最终签名 APK 已重新解码，全部 120 个数组与 0.2.0 逐项一致，15 个图标链接与资源、685 个签名条目及相同签名证书检查通过；生成代码的 11 项预览控制流程检查通过。**没有实机启动时间或提速百分比结论。**
+
+English: Parameters initialize separately for each look/strength pair in 60 holder classes. First selection creates two arrays for that pair (matrix and curve, 2,084 payload bytes), instead of initializing all 120 arrays in `RicohHook` (125,040 payload bytes). These counts exclude object, class and runtime overhead. Menu availability checks recognize IDs without loading the arrays. Existing color parameters are retained; generated arrays were compared exactly against all 120 compiled arrays in published 0.2.0. The final signed APK was decoded again: all 120 arrays exactly match 0.2.0; all 15 badge links/resources, 685 signed entries and the unchanged signing certificate passed checks. Eleven emitted-code preview control-flow checks passed. **There is no hardware startup-time measurement or percentage-speedup claim.**
+
+日本語：「フィルター＋強度」ごとに60個の独立したクラスでパラメータを初期化します。初回選択でその組み合わせの行列とカーブの2配列（データ部分2,084バイト）を作り、`RicohHook`で全120配列（同125,040バイト）を一括初期化しません。オブジェクト、クラス、実行環境の管理領域はこの数に含みません。メニューの利用可否判定はIDだけを確認し、配列を読み込みません。既存の色パラメータを維持し、生成配列を公開0.2.0の全120配列と照合しました。最終署名APKを再展開し、全120配列の0.2.0との完全一致、15種類のアイコン参照とリソース、685署名項目、同一署名証明書を確認しました。生成コードのプレビュー制御フロー11項目も検査済みです。**起動時間の実測や高速化率の主張はありません。**
+
+Before a camera-tested release, check still preview and movie standby separately: rapid movement followed by center; MENU/back and half-shutter cancellation; leaving and reopening the browser; preview-application failure; saved JPEGs and movies with the confirmed look; and cold/warm startup timing. Preserve private captures locally; do not attach them to public reports by default.
+
 ## 0.2.0-alpha / 胶片工坊 / Film Studio
 
 `FilmStudio-0.2.0-alpha-movie.apk` — SHA-256:
@@ -81,11 +97,13 @@ English: Independent training and validation use the unclipped region of the neu
 Optional compiled-payload regression check after decompiling the signed APK:
 
 ```sh
-java -jar inputs/apktool.jar d -r output/FilmStudio-0.2.0-alpha-movie.apk -o build-local/verify-020
-python tools/check_combined.py --decoded build-local/verify-020 --upstream-hook inputs/upstream/src/smali/RicohHook.smali
+java -jar inputs/apktool.jar d -r output/FilmStudio-0.3.0-alpha-movie.apk -o build-local/verify-030
+python tools/check_combined.py --decoded build-local/verify-030 --upstream-hook inputs/upstream/src/smali/RicohHook.smali
+python tools/check_live_preview.py build-local/verify-030
+python -m unittest discover -s tools -p test_filter_icons.py --previous-decoded PATH_TO_DECODED_020
 ```
 
-Use a fresh verification directory. To compare all forty previous Fujifilm look/strength combinations, add `--previous-decoded PATH_TO_DECODED_013`. This option reads the previous build; it does not connect to the camera.
+Use a fresh verification directory. Replace `PATH_TO_DECODED_020` with a separately decoded released 0.2.0 APK to compare all 120 arrays. If that reference is unavailable, omit `--previous-decoded`; the check still compares the final holder arrays against the local fitted profiles and pinned Ricoh source. A decoded 0.1.3 reference is also accepted for the eighty earlier Fujifilm arrays. These checks also reject eager initialization in the hook or preset-availability lookup and verify each holder/reference pair. They read local files and do not connect to the camera.
 
 
 After completing the rights and input steps in the [installation guide](INSTALL.en.md):

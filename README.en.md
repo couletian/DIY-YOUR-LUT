@@ -4,9 +4,9 @@
 
 An unofficial film-look experiment for the **Sony a5100 / ILCE-5100**. It references the hardware color-processing approach in [bonyback1's Ricoh mod](https://github.com/bonyback1/sony-pmca-ricoh-mod) and uses [Fujifilm's publicly available GFX ETERNA 55 LUTs](https://www.fujifilm-x.com/global/support/download/lut/) as color-research references for photographs and experimental video.
 
-**Version: 0.2.0-alpha; on-camera version: 0.2a; app name: 胶片工坊.** Documentation is available in three languages; the camera UI is currently primarily Chinese.
+**Published: 0.2.0-alpha (on-camera 0.2a). Local development: 0.3.0-alpha (0.3a), not yet published or hardware-tested.** The app is named 胶片工坊 / Film Studio. Documentation is available in three languages; the camera UI is currently primarily Chinese. Download links below still point to the available 0.2.0 release.
 
-**Renamed to Film Studio (胶片工坊), combining ten Fujifilm-reference and five upstream Ricoh/street-style presets, fifteen in total.** Menu labels use 富士 / 理光 prefixes. The package and signing certificate are retained for an in-place update from 富士风格. The combined build installed and launched on the a5100, with successful parameter-application logs for selected presets; saved photographs/video from this version remain unverified. [0.1.3-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.1.3-alpha) remains available for rollback.
+**Version 0.2.0 renamed the app to Film Studio (胶片工坊), combining ten Fujifilm-reference and five upstream Ricoh/street-style presets, fifteen in total.** Menu labels use 富士 / 理光 prefixes. The package and signing certificate are retained for an in-place update from 富士风格. The combined build installed and launched on the a5100, with successful parameter-application logs for selected presets; saved photographs/video from 0.2.0 remain unverified. [0.1.3-alpha](https://github.com/ukiki0718-netizen/sony-a5100-film-studio/releases/tag/v0.1.3-alpha) remains available for rollback.
 
 <a id="compatibility"></a>
 
@@ -37,11 +37,11 @@ This is an unofficial experimental release with only the a5100 evidence describe
 
 → **[Complete English installation guide](docs/INSTALL.en.md)**: inputs → local build → first-time connection → Wi-Fi ADB installation → camera controls → updates and troubleshooting.
 
-With your own lawfully built APK and Wi-Fi ADB already enabled:
+With your own lawfully built local 0.3.0 APK and Wi-Fi ADB already enabled:
 
 ```sh
 adb connect CAMERA_IP:5555
-adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.2.0-alpha-movie.apk
+adb -s CAMERA_IP:5555 install -r output/FilmStudio-0.3.0-alpha-movie.apk
 ```
 
 **IP address and privacy:** `CAMERA_IP` is a placeholder. Replace it with the current IP shown on your own camera in Tweak → Developer; do not type the placeholder literally or copy someone else's address. Keep the `:5555` port. Public instructions use a placeholder; hide or remove actual IP addresses before sharing screenshots or logs.
@@ -51,6 +51,15 @@ First-time users also need the preparation steps in the guide.
 ### Does the APK recipient need to compile anything?
 
 **No. A signed APK can be installed through the documented procedure; runtime compatibility still depends on the camera and environment.** Recipients do not need Python, Java, Apktool or the private signing key. The local build chapters are for modifying or generating an APK yourself; doing so does not itself resolve third-party permissions.
+
+## Changes in the local 0.3.0 development build
+
+- The filter browser keeps the live camera image visible. Move with the directional buttons or dial and pause to preview; press center to confirm, or back/cancel to restore the look active when the browser opened. Confirm before taking a photograph or pressing MOVIE.
+- Rapid browsing applies only the last highlighted choice after a 120 ms debounce. This delay is a code setting, not a measured camera response time.
+- Fifteen different color-and-letter badges help identify the looks. They are identifiers, not sample photographs.
+- Each look/strength matrix and curve pair loads on first selection and is reused, instead of initializing every combination at startup. All existing color parameters for fifteen looks and four strengths are preserved.
+
+**These changes have not been tested on a camera.** Live preview, cancellation, saved photographs/video, and startup/switching times still need verification in this build. No measured speedup is claimed. The downloadable 0.2.0 APK does not include these additions.
 
 ## Features
 

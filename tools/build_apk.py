@@ -18,16 +18,19 @@ import xml.etree.ElementTree as ET
 import zipfile
 from sign_apk import sign_apk, ensure_pem
 from movie_menu import LABELS as MOVIE_LABELS, patch_movie_menu
-from filter_strength import STRENGTHS, LABELS as STRENGTH_LABELS, blend_profile, patch_strength_menu, strength_methods
+from filter_strength import STRENGTHS, LABELS as STRENGTH_LABELS, patch_strength_menu, strength_methods
 from film_profiles import EXPECTED_HOOK, combined_profiles
+from profile_loading import field_reference, empty_init, write_profile_holders
+from filter_icons import patch_icons
+from live_preview import patch_live_preview
 
 OLD = 'com.sony.imaging.app.pictureeffectplus'
 NEW = 'com.yuki.imaging.app.pictureeffectplus'
 HOOK = 'L'+OLD.replace('.','/')+'/shooting/camera/RicohHook;'
 CTRL = 'L'+OLD.replace('.','/')+'/shooting/camera/PictureEffectPlusController;'
 EXPECTED = '80cb4a541f5f3dd49e8f53ffb1905048097fec17209fc9cb595a00681e65e8ea'
-VERSION = '0.2.0-alpha'
-ANDROID_VERSION = '0.2a'
+VERSION = '0.3.0-alpha'
+ANDROID_VERSION = '0.3a'
 APP_NAME = '胶片工坊'
 
 def replace_method(text, signature, replacement):
@@ -54,9 +57,9 @@ def lookup_method(name, profiles, kind, movie=False):
             for strength in STRENGTHS[:-1]:
                 lines += [f'    const/16 v0, {hex(strength)}',
                           f'    if-ne v1, v0, :strength_{i}_{strength}',
-                          f'    sget-object v0, {HOOK}->sFuji{kind}{i}_{strength}:{ret}',
+                          f'    sget-object v0, {field_reference(HOOK, kind, i, strength)}',
                           '    return-object v0', f'    :strength_{i}_{strength}']
-            lines += [f'    sget-object v0, {HOOK}->sFuji{kind}{i}_100:{ret}']
+            lines += [f'    sget-object v0, {field_reference(HOOK, kind, i, 100)}']
         else:
             value=p['name'] if kind=='name' else p['guide']
             lines += [f'    const-string v0, {quote(value)}']
@@ -74,22 +77,16 @@ def lookup_method(name, profiles, kind, movie=False):
                       '    return-object v0', f'    :ui_next_{i}']
     return '\n'.join(lines+['    :none','    const/4 v0, 0x0','    return-object v0','.end method'])
 
-def make_init(profiles):
-    lines=['.method static constructor <clinit>()V','    .locals 2']
-    arrays=[]
-    for i,p in enumerate(profiles):
-        for strength in STRENGTHS:
-            blend = blend_profile(p, strength)
-            for kind,count,dex_type,values,width in [
-                ('matrix',9,'[I',sum(blend['matrix'],[]),4),
-                ('gamma',2048,'[B',[b for v in blend['gamma'] for b in (v&255,v>>8)],1)]:
-                lines += [f'    const/16 v0, {hex(count)}',f'    new-array v1, v0, {dex_type}',
-                          f'    fill-array-data v1, :data_{kind}_{i}_{strength}',
-                          f'    sput-object v1, {HOOK}->sFuji{kind}{i}_{strength}:{dex_type}']
-                arrays += [f'    :data_{kind}_{i}_{strength}',f'    .array-data {width}']
-                arrays += ['        '+(('-0x%x'%-v if v<0 else '0x%x'%v)+('t' if width==1 else '')) for v in values]
-                arrays += ['    .end array-data']
-    return '\n'.join(lines+['    return-void']+arrays+['.end method'])
+def preset_check(profiles):
+    # Menu availability checks must not initialize the profile arrays.
+    lines=['.method public static isRicohPreset(Ljava/lang/String;)Z', '    .locals 1']
+    for p in profiles:
+        lines += [f'    const-string v0, {quote(p["id"])}',
+                  '    invoke-virtual {v0, p0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z',
+                  '    move-result v0', '    if-nez v0, :known']
+    return '\n'.join(lines+['    const/4 v0, 0x0', '    return v0',
+                            '    :known', '    const/4 v0, 0x1',
+                            '    return v0', '.end method'])
 
 def preset_ids(profiles):
     lines=['.method public static getPresetIds()Ljava/util/List;','    .locals 2',
@@ -160,11 +157,8 @@ def movie_settings_log():
 
 def patch_hook(path,profiles,upstream_hook,movie=False):
     text=path.read_text()
-    fields='\n'.join(f'.field private static sFuji{k}{i}_{strength}:{t}' for i in range(len(profiles))
-                     for strength in STRENGTHS
-                     for k,t in [('matrix','[I'),('gamma','[B')])
-    text=text.replace('# static fields','# static fields\n'+fields)
-    text=replace_method(text,'<clinit>()V',make_init(profiles))
+    text=replace_method(text,'<clinit>()V',empty_init())
+    text=replace_method(text,'isRicohPreset(Ljava/lang/String;)Z',preset_check(profiles))
     for method,kind in [('getGammaBytes','gamma'),('getRGBMatrix','matrix'),
                         ('getFilterName','name'),('getFilterGuide','guide')]:
         ret={'gamma':'[B','matrix':'[I','name':'Ljava/lang/String;','guide':'Ljava/lang/String;'}[kind]
@@ -172,9 +166,9 @@ def patch_hook(path,profiles,upstream_hook,movie=False):
     original=upstream_hook.read_text()
     apply=re.search(r'^\.method public static applyHook\([\s\S]*?^\.end method',original,re.M).group()
     # Fail closed if matrix/gamma handles are unavailable, instead of reporting success.
-    apply=apply.replace('if-eqz v2, :cond_4','if-eqz v2, :fuji_failed')
-    apply=apply.replace('if-eqz v2, :cond_5','if-eqz v2, :fuji_failed')
-    apply=apply.replace('if-eqz v3, :cond_5','if-eqz v3, :fuji_failed')
+    for branch in ('if-eqz v2, :cond_4', 'if-eqz v2, :cond_5', 'if-eqz v3, :cond_5'):
+        assert apply.count(branch) == 1, branch
+        apply=apply.replace(branch, branch.split(',')[0]+', :fuji_failed')
     apply=apply.replace('    :catch_0\n','    :fuji_failed\n    const/4 v0, 0x0\n    return v0\n\n    :catch_0\n')
     text=replace_method(text,'applyHook('+CTRL+'Landroid/util/Pair;Ljava/lang/String;)Z',apply)
     text+='\n'+preset_ids(profiles)+'\n'+movie_hook()+'\n'+strength_methods(HOOK,CTRL)+'\n'
@@ -182,6 +176,7 @@ def patch_hook(path,profiles,upstream_hook,movie=False):
         text+='\n'+movie_settings_log()+'\n'
     text=text.replace('"RicohHook"','"FujiHook"').replace('Ricoh preset','Fuji approximation')
     path.write_text(text)
+    write_profile_holders(path,profiles,HOOK)
 
 def patch_menu(base,profiles):
     path=base/'assets/MenuData.xml'
@@ -461,7 +456,9 @@ def main():
     subprocess.run(['java','-jar',str(args.apktool),'d','-r','-f',str(args.input),'-o',str(args.work)],check=True)
     patch_hook(args.work/'smali'/OLD.replace('.','/')/'shooting/camera/RicohHook.smali',profiles,args.upstream_hook,args.movie)
     patch_menu(args.work,profiles)
+    patch_icons(args.work,profiles)
     if args.movie:patch_movie(args.work)
+    patch_live_preview(args.work,profiles)
     rename_package(args.work)
     # Keep attribution and license scope with the installable artifact itself.
     legal=args.work/'assets/legal'
@@ -491,7 +488,10 @@ def main():
                   camera_tested=False,encoded_video_filter_verified=False,
                   source_apk_sha256=EXPECTED,profiles=len(profiles),
                   app_name=APP_NAME,android_version=ANDROID_VERSION,
-                  profile_families={'fujifilm':10,'ricoh':5})
+                  profile_families={'fujifilm':10,'ricoh':5},
+                  live_filter_preview=True,preview_debounce_ms=120,
+                  unique_filter_icons=15,lazy_profile_holders=60,
+                  startup_timing_measured=False)
     (root/'profiles/film_studio.json').write_text(json.dumps(dict(
         version=VERSION,presets=profiles),ensure_ascii=False,indent=2))
     (root/'validation'/(output.stem+'.json')).write_text(json.dumps(metadata,indent=2))
