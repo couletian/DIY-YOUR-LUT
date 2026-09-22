@@ -1,4 +1,11 @@
+#DIY YOUR LUT
+Building on the “sony-a5100-film-studio” project, this skill gives people the ability to customize their own LUTs and import them into an existing Film Studio installation package.
+
+This branch implements LUT DIY by building a visual LUT adjuster that can also import local images for preview in advance, and export custom LUTs into the existing “Film Studio” APK. This feature has been integrated into a skill tool that can be directly invoked by AI—“camera-lut-studio”.
+
+
 # 胶片工坊 / Film Studio
+
 
 **中文** · [English](README.en.md) · [日本語](README.ja.md)
 
